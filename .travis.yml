@@ -1,0 +1,35 @@
+language: cpp
+notifications:
+  email: false
+git:
+  submodules: false
+matrix:
+  include:
+  - os: osx
+before_install:
+- git submodule update --init --recursive
+- '[ "$TRAVIS_OS_NAME" != osx ] || rvm install 2.3.0'
+- '[ "$TRAVIS_OS_NAME" != osx ] || brew update'
+- '[ "$TRAVIS_OS_NAME" != osx ] || brew install qt5'
+- '[ "$TRAVIS_OS_NAME" != osx ] || brew link --force qt5'
+install:
+- qmake --version
+script:
+- mkdir -p build && cd build
+- qmake ./../hybrid.pro
+- make
+- pwd
+- ls
+- rm -rf Makefile *.cpp *.h *.o .qmake.stash
+- zip -rm hybrid.zip hybrid.app
+- ls -lha
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: dXIsCceAQ4XE/71a18hhdufrRHpvRnb4SVxtEOTM86vpnJZNrvtnkjq9r45OHtEmcOal88cCM19FOmpj3EefAKNiJ1YVe5/AQ94jFAkHSzqUSeNYn2nsGCPmLxuYHFIGJdtqJf2gqSFluLKhcXeHBT+cZrisnYWzL6oLbQ9mfLhnOSiBziISflTQlEUD6pyLUik59Oi7U8Dov7BCvsSprUoWQCBONEYKbuczMXd60vicFS9eMQDAUBlZo74JDMPVDSy0H3W3Ff9WmM56IlNLmWEwJGxS9amRxKgvta/242ZCY9b00oD87Qh9nuONiNGZ5557zUOgNl2C7DD/b1b00AidY1tes8qMx4RAjtdlqZIoVODdtsZdNIzsJ5T34VEqzG0jNNkNMs1iaqrpWv4yi1sGICHv47fxZTD2sHRf3yi7nmPyjhLWmq95HuWm6erxhp9B94UDuwmkA5uXDbLTQt4GDC6dBA+wJRmoOBtM4/aU5dhFD5s6L3jVS1biZxMhHGiq5+Gevmq5RtK9gEX6EfmcGatuu+QInAHJdijYR9aIwhhKJQ0nJr8v0pgv5sDFdqfBsHuyxuljZ7Z0T8tg5itSs4LyWHvgmNlJYetTD3LF5CglW0xzB1DdzqYgAGpY28tyVDi0oelwrcqTPvUO2mnMrlrUGVEGMyydJJ2ZdCk=
+  file: /Users/travis/build/onoie/hybrid/build/hybrid.zip
+  on:
+    repo: onoie/hybrid
+    tags: true
+    all_branches: true
